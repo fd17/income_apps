@@ -3,7 +3,7 @@ import type { SiteMeta } from '@repo/ui/config';
 export const site: SiteMeta = {
   name: 'Billsnap',
   tagline: 'Professional invoices in 30 seconds. Free, no signup.',
-  url: process.env.SITE_URL ?? 'https://example.com',
+  url: process.env.SITE_URL ?? 'https://fd17-billsnap.pages.dev',
 };
 
 /** One-time Pro price shown on the marketing pages. */

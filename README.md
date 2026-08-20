@@ -24,7 +24,7 @@ removal) so it can earn immediately via SEO, then grow into invoicing + payments
 ```
 income_apps/
 ├── apps/
-│   ├── billsnap/            # invoice generator (primary GitHub Pages site)
+│   ├── billsnap/            # invoice generator (Cloudflare Pages + custom domain)
 │   └── example-site/        # starter website (copy this to add more)
 ├── packages/
 │   └── ui/                  # shared layout, components, styles, helpers
@@ -58,6 +58,7 @@ A browser-only invoice generator aimed at the “free invoice generator” searc
 - Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
 - Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link whose success URL is
   `/app/?unlocked=1` to start charging. Optional `PUBLIC_DONATE_URL` for a tip jar.
+- Hosted on Cloudflare Pages with a custom domain (not GitHub Pages).
 
 ```bash
 pnpm --filter billsnap test   # invoice math
@@ -75,29 +76,41 @@ pnpm --filter my-new-site dev
 Anything under `apps/*` is picked up automatically by install, build, and the deploy
 workflows.
 
-## Deploy (free providers)
+## Deploy (custom domain, not GitHub Pages)
 
-Every site builds to a static bundle in `apps/<app>/dist`, which any static host can
-serve. Pipelines are included for the main free options:
+Billsnap is **not** published via GitHub Pages — `fd17.github.io` already uses that
+slot. It deploys to **Cloudflare Pages** (free), which gives the project its own
+hostname (`fd17-billsnap.pages.dev`) and a real custom domain on the free tier.
 
-| Provider             | How                                                                                                              | Best for                               |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **Cloudflare Pages** | `.github/workflows/deploy-cloudflare-pages.yml` (needs `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` secrets) | Many sites from one repo (recommended) |
-| **GitHub Pages**     | `.github/workflows/deploy-github-pages.yml` (no secrets)                                                         | One primary site, zero setup           |
-| **Netlify**          | `apps/<app>/netlify.toml`                                                                                        | Per‑site, connect in Netlify UI        |
-| **Vercel**           | `apps/<app>/vercel.json`                                                                                         | Per‑site, connect in Vercel UI         |
+### One-time Cloudflare + DNS
 
-Cloudflare Pages allows an unlimited number of projects on its free tier, so it is the
-recommended default when publishing several sites. GitHub Pages serves a single site per
-repository — use it for the repo's primary site.
+1. Create a free [Cloudflare](https://dash.cloudflare.com/sign-up) account.
+2. Add GitHub Actions **secrets** on this repo:
+   - `CLOUDFLARE_API_TOKEN` — token with **Account / Cloudflare Pages / Edit**
+   - `CLOUDFLARE_ACCOUNT_ID` — from the Cloudflare dashboard URL or Overview
+3. Add GitHub Actions **variable** `BILLSNAP_SITE_URL` = `https://your-domain.tld`
+   (no trailing slash).
+4. Point DNS at the Pages project:
 
-Each site's canonical URL and base path are configurable via `SITE_URL` and `BASE_PATH`
-env vars (see `apps/billsnap/.env.example`). The deploy workflows set these for you.
+   | Name       | Type                       | Target                    |
+   | ---------- | -------------------------- | ------------------------- |
+   | `@` (apex) | CNAME (flattened) or ALIAS | `fd17-billsnap.pages.dev` |
+   | `www`      | CNAME                      | `fd17-billsnap.pages.dev` |
 
-GitHub Pages deploys Billsnap on push (and via `workflow_dispatch`). Cloudflare Pages
-stays `workflow_dispatch` because it needs API secrets first.
+   If the domain’s nameservers are on the same Cloudflare account, you can instead run:
 
-CI (format, lint, type-check, tests, build) runs on every push and PR.
+   ```bash
+   CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
+     ./scripts/attach-billsnap-domain.sh your-domain.tld
+   ```
+
+Push to `main` (or run **Deploy Billsnap to Cloudflare Pages**) after the secrets
+exist. Canonical URLs come from `BILLSNAP_SITE_URL` / `SITE_URL` (see
+`apps/billsnap/.env.example`).
+
+Netlify and Vercel configs remain under each app if you prefer those UIs instead.
+
+CI (format, lint, type-check, tests, build) still runs on every push and PR.
 
 ## Cloud Agent environment
 
