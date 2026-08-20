@@ -1,13 +1,20 @@
-# Deploys ONE site (apps/example-site) to GitHub Pages — a zero-config, zero-secret
-# free host. GitHub Pages serves a single site per repository, so use this for the
-# repo's primary site and use Cloudflare Pages (deploy-cloudflare-pages.yml) when
-# you want to publish many sites from this monorepo.
+# Deploys Billsnap (apps/billsnap) to GitHub Pages — a zero-config, zero-secret
+# free host. GitHub Pages serves a single site per repository, so this is the
+# repo's primary income site. Use Cloudflare Pages when publishing many sites.
 #
 # Before the first run: repo Settings → Pages → "Build and deployment" → Source =
-# "GitHub Actions". Then run this workflow.
+# "GitHub Actions". Then this workflow can publish on push.
 name: Deploy to GitHub Pages
 
 on:
+  push:
+    paths:
+      - 'apps/billsnap/**'
+      - 'packages/ui/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/deploy-github-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,14 +39,16 @@ jobs:
       - uses: actions/configure-pages@v5
         id: pages
       - run: pnpm install --frozen-lockfile
-      - name: Build example-site
-        run: pnpm --filter example-site build
+      - name: Test billsnap
+        run: pnpm --filter billsnap test
+      - name: Build billsnap
+        run: pnpm --filter billsnap build
         env:
           SITE_URL: ${{ steps.pages.outputs.origin }}
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/example-site/dist
+          path: apps/billsnap/dist
 
   deploy:
     needs: build

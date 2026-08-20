@@ -4,8 +4,9 @@ A monorepo for building and deploying **multiple income‑generating websites** 
 pages, donation/landing pages, small products) — all from one place, and deployable to
 **free hosting providers**.
 
-The apps themselves come later. This repo is the _environment_: shared code, one command
-to build every site, and ready‑to‑use deploy pipelines for free hosts.
+The first live product is **Billsnap**, a free freelancer invoice generator
+(`apps/billsnap`). It is a static, no-signup tool with a $9 Pro unlock (watermark
+removal) so it can earn immediately via SEO, then grow into invoicing + payments.
 
 ## Stack
 
@@ -23,7 +24,8 @@ to build every site, and ready‑to‑use deploy pipelines for free hosts.
 ```
 income_apps/
 ├── apps/
-│   └── example-site/        # a starter website (copy this to add more)
+│   ├── billsnap/            # invoice generator (primary GitHub Pages site)
+│   └── example-site/        # starter website (copy this to add more)
 ├── packages/
 │   └── ui/                  # shared layout, components, styles, helpers
 ├── scripts/new-site.sh      # scaffold a new site from example-site
@@ -36,14 +38,31 @@ income_apps/
 
 ```bash
 pnpm install        # install all workspace deps
-pnpm dev            # run every site's dev server (example-site → http://localhost:4321)
+pnpm dev            # run every site's dev server (example-site → :4321, billsnap → :4322)
+pnpm test           # unit tests (Billsnap invoice math)
 pnpm build          # build every site to <app>/dist
 pnpm check          # type-check every site/package
 pnpm lint           # prettier --check
 pnpm format         # prettier --write
 ```
 
-Run a single site with pnpm filters, e.g. `pnpm --filter example-site dev`.
+Run a single site with pnpm filters, e.g. `pnpm --filter billsnap dev`
+(http://localhost:4322) or `pnpm --filter example-site dev`.
+
+## Billsnap
+
+A browser-only invoice generator aimed at the “free invoice generator” search:
+
+- Create / preview / Print-to-PDF, with tax, discounts, currencies, and a logo
+- Drafts saved in `localStorage` (no backend, no account)
+- Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
+- Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link whose success URL is
+  `/app/?unlocked=1` to start charging. Optional `PUBLIC_DONATE_URL` for a tip jar.
+
+```bash
+pnpm --filter billsnap test   # invoice math
+pnpm --filter billsnap dev    # http://localhost:4322
+```
 
 ## Add a new site
 
@@ -73,14 +92,15 @@ recommended default when publishing several sites. GitHub Pages serves a single 
 repository — use it for the repo's primary site.
 
 Each site's canonical URL and base path are configurable via `SITE_URL` and `BASE_PATH`
-env vars (see `apps/example-site/.env.example`). The deploy workflows set these for you.
+env vars (see `apps/billsnap/.env.example`). The deploy workflows set these for you.
 
-> Note: none of these run automatically on push. Deploy workflows are manual
-> (`workflow_dispatch`) so you can enable a provider and add its credentials as GitHub
-> **Secrets** first. CI (build/lint/type-check) runs on every push and PR.
+GitHub Pages deploys Billsnap on push (and via `workflow_dispatch`). Cloudflare Pages
+stays `workflow_dispatch` because it needs API secrets first.
+
+CI (format, lint, type-check, tests, build) runs on every push and PR.
 
 ## Cloud Agent environment
 
 `.cursor/environment.json` configures Cursor Cloud Agents for this repo: it installs deps
-(`pnpm install --frozen-lockfile`) and runs `pnpm dev` in a persistent terminal, exposing
-`example-site` on port 4321.
+(`pnpm install --frozen-lockfile`) and runs `pnpm dev` in a persistent terminal.
+example-site is served on http://localhost:4321, billsnap on http://localhost:4322.

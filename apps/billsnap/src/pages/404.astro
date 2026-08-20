@@ -1,0 +1,18 @@
+---
+import Button from '@repo/ui/Button.astro';
+import Layout from '../components/Layout.astro';
+import { site } from '../site';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout site={site} page="Not found" description="That page is not on Billsnap.">
+  <main class="section prose">
+    <h1>Page not found</h1>
+    <p class="lede">That URL is not an invoice. Head back to the generator.</p>
+    <div class="row-actions">
+      <Button href={base}>Home</Button>
+      <Button href={`${base}app/`.replace(/\/+/g, '/')} variant="ghost">Create invoice</Button>
+    </div>
+  </main>
+</Layout>

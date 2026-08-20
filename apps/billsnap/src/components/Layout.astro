@@ -1,0 +1,57 @@
+---
+import '../styles/site.css';
+import { pageTitle, type SiteMeta } from '@repo/ui/config';
+
+interface Props {
+  site: SiteMeta;
+  page?: string;
+  description?: string;
+}
+
+const { site, page, description } = Astro.props;
+const title = pageTitle(site, page);
+const base = import.meta.env.BASE_URL;
+const homeHref = base;
+const appHref = `${base}app/`.replace(/\/+/g, '/');
+const pricingHref = `${base}pricing/`.replace(/\/+/g, '/');
+const privacyHref = `${base}privacy/`.replace(/\/+/g, '/');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={new URL(Astro.url.pathname, site.url).toString()} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <link rel="icon" href={`${base}favicon.svg`.replace(/\/+/g, '/')} type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="site-header no-print">
+        <a class="brand" href={homeHref}>
+          <span class="brand-mark">B</span>
+          Billsnap
+        </a>
+        <nav class="nav">
+          <a href={appHref}>Create invoice</a>
+          <a href={pricingHref}>Pricing</a>
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer no-print">
+        <span>Billsnap · invoices stay in your browser</span>
+        <nav class="nav">
+          <a href={privacyHref}>Privacy</a>
+          <a href={pricingHref}>Pro</a>
+          <a href="https://github.com/fd17/income_apps">Source</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

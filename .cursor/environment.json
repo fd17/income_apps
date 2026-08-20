@@ -5,13 +5,17 @@
     {
       "name": "dev",
       "command": "pnpm dev",
-      "description": "Turborepo dev servers for every site under apps/. example-site is served on http://localhost:4321"
+      "description": "Turborepo dev servers for every site under apps/. example-site is on http://localhost:4321, billsnap on http://localhost:4322"
     }
   ],
   "ports": [
     {
       "name": "example-site",
       "port": 4321
+    },
+    {
+      "name": "billsnap",
+      "port": 4322
     }
   ]
 }

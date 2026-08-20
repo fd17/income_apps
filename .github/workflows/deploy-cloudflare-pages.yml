@@ -15,7 +15,7 @@ on:
       app:
         description: App folder under apps/ to deploy
         required: true
-        default: example-site
+        default: billsnap
 
 jobs:
   deploy:
