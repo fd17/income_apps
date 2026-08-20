@@ -264,7 +264,7 @@ function refresh(root: HTMLElement, opts?: { keepFocus?: HTMLElement }): void {
   }
   if (hint) {
     hint.textContent = isPro
-      ? 'Pro is on — no Billsnap line on the PDF, unlimited saves.'
+      ? 'Pro is on — no Billsnap watermark on the PDF, unlimited saves.'
       : `Free plan · ${saved.length}/${FREE_SAVED_LIMIT} saved invoices in this browser`;
   }
 
