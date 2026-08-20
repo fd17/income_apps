@@ -86,7 +86,8 @@ Push to `main` deploys when repo secrets `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` are set. Canonical URLs use `SITE_URL` /
 `BILLSNAP_SITE_URL` (see `apps/billsnap/.env.example`).
 
-To attach another hostname on the same Cloudflare account:
+To attach another hostname on the same Cloudflare account (adds apex + www,
+creates proxied CNAMEs to `fd17-billsnap.pages.dev`, and waits for SSL):
 
 ```bash
 CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \

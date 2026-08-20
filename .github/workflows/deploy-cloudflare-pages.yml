@@ -51,14 +51,14 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy apps/billsnap/dist --project-name=fd17-billsnap --branch=main
       - name: Attach custom domain
-        if: ${{ vars.BILLSNAP_SITE_URL != '' }}
         continue-on-error: true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          BILLSNAP_SITE_URL: ${{ vars.BILLSNAP_SITE_URL }}
+          BILLSNAP_SITE_URL: ${{ vars.BILLSNAP_SITE_URL || 'https://sendtheinvoice.com' }}
         run: |
           host="${BILLSNAP_SITE_URL#https://}"
           host="${host#http://}"
           host="${host%%/*}"
-          npx --yes wrangler@4 pages domain add "$host" --project-name=fd17-billsnap
+          chmod +x ./scripts/attach-billsnap-domain.sh
+          ./scripts/attach-billsnap-domain.sh "$host"
