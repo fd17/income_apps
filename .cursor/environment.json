@@ -1,0 +1,17 @@
+{
+  "name": "income-apps",
+  "install": "corepack enable 2>/dev/null; pnpm install --frozen-lockfile",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "pnpm dev",
+      "description": "Turborepo dev servers for every site under apps/. example-site is served on http://localhost:4321"
+    }
+  ],
+  "ports": [
+    {
+      "name": "example-site",
+      "port": 4321
+    }
+  ]
+}
