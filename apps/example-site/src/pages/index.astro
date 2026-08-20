@@ -1,0 +1,58 @@
+---
+import BaseLayout from '@repo/ui/BaseLayout.astro';
+import Button from '@repo/ui/Button.astro';
+import { site } from '../site';
+
+const base = import.meta.env.BASE_URL;
+const donateHref = `${base}donate/`.replace(/\/+/g, '/');
+
+const features = [
+  {
+    title: 'Add a site in minutes',
+    body: 'Copy an app folder under apps/, rename it, and it is wired into install, build, and deploy automatically.',
+  },
+  {
+    title: 'Share code once',
+    body: 'Common layout, styling, and helpers live in packages/ui and are reused by every site.',
+  },
+  {
+    title: 'Ship for free',
+    body: 'Each site outputs a static bundle ready for Cloudflare Pages, Netlify, Vercel, or GitHub Pages.',
+  },
+];
+---
+
+<BaseLayout site={site} description={site.tagline}>
+  <main class="container" style="padding-top: 12vh; padding-bottom: 8vh;">
+    <p
+      style="color: var(--brand); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 12px;"
+    >
+      income-apps monorepo
+    </p>
+    <h1 style="font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.1; margin: 0 0 16px;">
+      Build many websites. Deploy them for free.
+    </h1>
+    <p style="font-size: 1.15rem; color: var(--muted); max-width: 620px;">
+      {site.tagline}. This starter proves the pipeline works end to end — from a shared component
+      library to a static bundle a host can serve.
+    </p>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 28px 0 56px;">
+      <Button href={donateHref}>Support this project</Button>
+      <Button href="https://github.com/fd17/income_apps" variant="ghost">View the code</Button>
+    </div>
+
+    <section
+      style="display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));"
+    >
+      {
+        features.map((f) => (
+          <article style="background: var(--bg-soft); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 22px;">
+            <h2 style="margin: 0 0 8px; font-size: 1.15rem;">{f.title}</h2>
+            <p style="margin: 0; color: var(--muted);">{f.body}</p>
+          </article>
+        ))
+      }
+    </section>
+  </main>
+</BaseLayout>
