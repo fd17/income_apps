@@ -1,0 +1,38 @@
+# Deploys sites in this monorepo to Cloudflare Pages — a free host that supports
+# an unlimited number of projects, which makes it the best fit for publishing many
+# sites from one repo.
+#
+# One-time setup:
+#   1. Create a Cloudflare account (free) and a Pages project per app. The project
+#      name must match the folder name under apps/ (e.g. "example-site").
+#   2. Add repo secrets: CLOUDFLARE_API_TOKEN (Pages:Edit) and CLOUDFLARE_ACCOUNT_ID.
+#   3. Run this workflow and pick the app to deploy.
+name: Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App folder under apps/ to deploy
+        required: true
+        default: example-site
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build ${{ inputs.app }}
+        run: pnpm --filter ${{ inputs.app }} build
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/${{ inputs.app }}/dist --project-name=${{ inputs.app }} --branch=main
