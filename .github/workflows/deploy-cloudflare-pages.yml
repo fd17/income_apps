@@ -6,9 +6,10 @@
 #   1. Cloudflare account (free).
 #   2. Repo secrets: CLOUDFLARE_API_TOKEN (Account → Cloudflare Pages → Edit)
 #      and CLOUDFLARE_ACCOUNT_ID.
-#   3. Repo variable BILLSNAP_SITE_URL = https://your-domain.tld (no trailing slash).
-#   4. Point DNS at this project (see README): CNAME to fd17-billsnap.pages.dev
-#      or add the hostname in Cloudflare if the zone is on the same account.
+#   3. Repo variable BILLSNAP_SITE_URL = https://sendtheinvoice.com (optional).
+#   4. Repo variable PUBLIC_CHECKOUT_URL = Stripe Payment Link (buy.stripe.com/...).
+#      After-pay redirect must be https://sendtheinvoice.com/app/?unlocked=1
+#   5. DNS already points at fd17-billsnap.pages.dev on sendtheinvoice.com.
 name: Deploy Billsnap to Cloudflare Pages
 
 on:
@@ -44,6 +45,10 @@ jobs:
         env:
           SITE_URL: ${{ vars.BILLSNAP_SITE_URL || 'https://sendtheinvoice.com' }}
           BASE_PATH: /
+          # Public Payment Link URL (inlined into static HTML). Prefer a repo
+          # variable; a secret also works if you already stored it there.
+          PUBLIC_CHECKOUT_URL: ${{ vars.PUBLIC_CHECKOUT_URL || secrets.PUBLIC_CHECKOUT_URL }}
+          PUBLIC_DONATE_URL: ${{ vars.PUBLIC_DONATE_URL || secrets.PUBLIC_DONATE_URL }}
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

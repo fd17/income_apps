@@ -56,8 +56,7 @@ A browser-only invoice generator aimed at the “free invoice generator” searc
 - Create / preview / Print-to-PDF, with tax, discounts, currencies, and a logo
 - Drafts saved in `localStorage` (no backend, no account)
 - Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
-- Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link whose success URL is
-  `/app/?unlocked=1` to start charging. Optional `PUBLIC_DONATE_URL` for a tip jar.
+- Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link (see **Stripe** below).
 - Hosted at [sendtheinvoice.com](https://sendtheinvoice.com) on Cloudflare Pages.
 
 ```bash
@@ -84,7 +83,7 @@ slot. Production is **https://sendtheinvoice.com** on Cloudflare Pages (project
 
 Push to `main` deploys when repo secrets `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` are set. Canonical URLs use `SITE_URL` /
-`BILLSNAP_SITE_URL` (see `apps/billsnap/.env.example`).
+`BILLSNAP_SITE_URL`. The Pro button uses `PUBLIC_CHECKOUT_URL` (see Stripe below).
 
 To attach another hostname on the same Cloudflare account (adds apex + www,
 creates proxied CNAMEs to `fd17-billsnap.pages.dev`, and waits for SSL):
@@ -97,6 +96,31 @@ CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
 Netlify and Vercel configs remain under each app if you prefer those UIs instead.
 
 CI (format, lint, type-check, tests, build) still runs on every push and PR.
+
+## Stripe (Pro unlock)
+
+Billsnap has no backend. Stripe Checkout is a **Payment Link**; after pay, Stripe
+sends the browser to `/app/?unlocked=1`, which sets Pro in `localStorage`.
+
+1. Create a [Stripe account](https://dashboard.stripe.com/register) and complete
+   activation if you want live charges (test mode works first).
+2. **Product catalog → Add product**
+   - Name: `Billsnap Pro`
+   - One-time, **$9 USD** (not a recurring price)
+3. **Payment links → New**
+   - Product: Billsnap Pro, quantity 1
+   - **After the payment → Confirmation page → Redirect to a URL**
+   - URL: `https://sendtheinvoice.com/app/?unlocked=1`
+4. Copy the link (`https://buy.stripe.com/...`).
+5. Add a GitHub Actions **variable** (Settings → Secrets and variables → Actions → Variables):
+   - `PUBLIC_CHECKOUT_URL` = that `buy.stripe.com` URL
+6. Redeploy: merge to `main`, or run **Deploy Billsnap to Cloudflare Pages**.
+
+Optional tip jar: another Payment Link (or Ko-fi) in variable `PUBLIC_DONATE_URL`.
+
+This unlock is device-local on purpose (static hosting). Anyone who opens
+`?unlocked=1` gets Pro in that browser. Fine for a $9 MVP; a signed Stripe session
+would need a Worker or other backend.
 
 ## Cloud Agent environment
 
