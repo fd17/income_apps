@@ -1,5 +1,0 @@
-# Runtime dependencies.
-#
-# The income apps shell out to the Kraken CLI (`kraken`) and use only the
-# Python standard library, so there are no third-party runtime packages.
-# The Kraken CLI itself is installed via scripts/install_kraken_cli.sh.

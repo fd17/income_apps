@@ -1,64 +1,64 @@
 # income_apps
 
-Repo for income generating apps built on the [Kraken CLI](https://github.com/krakenfx/kraken-cli).
+Starter repo for building **income-generating web apps**.
 
-The first app is a **dollar-cost-averaging (DCA) paper-trading bot**: it invests a
-fixed cash amount into an asset at the live market price on a schedule, using
-Kraken *paper trading* (simulated funds, live prices, no API credentials
-required), and reports the average entry price and profit/loss.
+The first app is **LaunchList** — a launch-ready waitlist / early-access landing
+page. It captures email signups, de-duplicates them, shows a live "people
+joined" social-proof counter, and persists signups through a small JSON-backed
+store. It's a common income pattern: validate demand and pre-sell before you
+build the full product.
 
-## Requirements
+## Stack
 
-- Python 3.10+
-- The `kraken` CLI (installed by `scripts/install_kraken_cli.sh`)
+- [Next.js](https://nextjs.org) 16 (App Router) + React 19
+- TypeScript
+- Tailwind CSS v4
+- [Vitest](https://vitest.dev) for unit tests
+- ESLint (`eslint-config-next`)
 
-## Setup
-
-```bash
-# Install a pinned, checksum-verified Kraken CLI onto ~/.local/bin
-bash scripts/install_kraken_cli.sh
-
-# Install dev tooling and the package (editable)
-pip3 install --user -r requirements-dev.txt
-pip3 install --user -e .
-```
-
-In Cloud Agents this is handled automatically by `.cursor/environment.json`.
-
-## Run the DCA bot
+## Getting started
 
 ```bash
-# Via the installed console script
-income-apps-dca --pair BTCUSD --budget 100 --rounds 3
-
-# Or as a module
-python3 -m income_apps.dca_bot --pair ETHUSD --budget 50 --rounds 3
+npm ci          # install dependencies
+npm run dev     # start the dev server on http://localhost:3000
 ```
 
-Options: `--pair`, `--budget` (cash per round), `--rounds`, `--interval`
-(seconds between rounds), `--starting-balance`, `--no-reset`.
+In Cloud Agents, `.cursor/environment.json` runs `npm ci` on setup and starts
+`npm run dev` in a named `next-dev` terminal automatically.
 
-Output is JSON lines: one `fill` event per round, then a `summary` and a final
-`result` with invested amount, units accumulated, average price, and P&L.
+## Scripts
 
-Paper trading needs no credentials. Live trading is an explicit opt-in and is
-out of scope for this starter app — see the Kraken skills for the safety
-checklist before ever pointing an agent at real funds.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server (http://localhost:3000) |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | Lint with ESLint |
+| `npm test` | Run unit tests (Vitest) |
 
-## Develop
+## How it works
+
+- `src/app/page.tsx` — server component landing page; reads the current signup
+  count and renders the hero, features, and the waitlist form.
+- `src/components/WaitlistForm.tsx` — client component; posts to the API and
+  shows the live count and confirmation.
+- `src/app/api/waitlist/route.ts` — `GET` returns the count; `POST` validates
+  and stores an email.
+- `src/lib/waitlist.ts` — pure domain logic (`normalizeEmail`, `isValidEmail`,
+  `addEmail`) plus a file-backed store written to `.data/waitlist.json`
+  (git-ignored). The pure helpers are unit-tested in `src/lib/waitlist.test.ts`.
+
+## API
 
 ```bash
-ruff check .   # lint
-pytest         # tests (hermetic; no network or kraken binary required)
+# Get the current signup count
+curl http://localhost:3000/api/waitlist
+
+# Join the waitlist
+curl -X POST http://localhost:3000/api/waitlist \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
 ```
 
-## Layout
-
-```
-src/income_apps/
-  kraken_client.py   # thin wrapper around the `kraken` CLI JSON contract
-  dca_bot.py         # DCA strategy: pure accounting + orchestration + CLI
-tests/               # hermetic unit tests using an in-memory fake client
-scripts/
-  install_kraken_cli.sh   # pinned, checksum-verified CLI installer
-```
+Signups are stored locally in `.data/waitlist.json`. Swap the store in
+`src/lib/waitlist.ts` for a database or email provider when you go to production.
