@@ -1,0 +1,5 @@
+# Cloudflare Pages project for Billsnap. Custom domains attach to this project;
+# GitHub Pages is not used (fd17.github.io already occupies that slot).
+name = "fd17-billsnap"
+compatibility_date = "2026-08-20"
+pages_build_output_dir = "./dist"

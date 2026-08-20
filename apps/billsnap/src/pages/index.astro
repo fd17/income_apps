@@ -1,0 +1,152 @@
+---
+import Button from '@repo/ui/Button.astro';
+import Layout from '../components/Layout.astro';
+import { PRO_PRICE, site } from '../site';
+
+const base = import.meta.env.BASE_URL;
+const appHref = `${base}app/`.replace(/\/+/g, '/');
+const pricingHref = `${base}pricing/`.replace(/\/+/g, '/');
+
+const features = [
+  {
+    title: 'From idea to PDF in one sitting',
+    body: 'Name, line items, tax, due date, logo, and payment details. The preview is the invoice you print.',
+  },
+  {
+    title: 'Nothing leaves this browser',
+    body: 'Drafts and saves live in localStorage. There is no account, no email capture, and no invoice database on a server.',
+  },
+  {
+    title: 'Built to grow into a product',
+    body: 'Today it is a free SEO tool with a $9 Pro unlock. Next: payment links on the invoice, reminders, then a client portal.',
+  },
+];
+
+const steps = [
+  {
+    n: '1',
+    title: 'Fill in both sides',
+    body: 'Your business on the left, the client on the right. Add a logo if you have one.',
+  },
+  {
+    n: '2',
+    title: 'Add what you did',
+    body: 'Hours, a fixed fee, or a mix. Tax and discount are percentages, totaled live.',
+  },
+  {
+    n: '3',
+    title: 'Download the PDF',
+    body: 'Print to PDF from the browser. Free invoices include a small Billsnap line; Pro removes it.',
+  },
+];
+
+const faqs = [
+  {
+    q: 'Is Billsnap really free?',
+    a: 'Yes. Create, print, and download invoices with no signup. The free PDF includes a one-line Billsnap mention. Pro is a one-time $9 unlock for no branding, the bold template, and unlimited saves in this browser.',
+  },
+  {
+    q: 'Where is my data stored?',
+    a: 'Only on your device. Billsnap is a static website. Clearing site data deletes drafts. Export a PDF if you need a copy outside the browser.',
+  },
+  {
+    q: 'Can clients pay through Billsnap?',
+    a: 'Not yet. Put your PayPal, Wise, bank, or Stripe payment link in Payment details so it prints on the invoice. Collecting payment inside Billsnap is the scalable follow-on product.',
+  },
+  {
+    q: 'Does this replace QuickBooks?',
+    a: 'No. It replaces the blank Google Doc you rebuild every time a client asks for an invoice. When you outgrow it, export PDFs and move the books later.',
+  },
+];
+---
+
+<Layout
+  site={site}
+  description="Free invoice generator for freelancers. Create a professional PDF in the browser — no signup. Pro removes the Billsnap line."
+>
+  <main>
+    <section class="hero">
+      <div>
+        <p class="kicker">Free invoice generator</p>
+        <h1>Send a clean invoice before the hour is over.</h1>
+        <p class="lede">
+          Billsnap is a freelancer invoice generator that runs in your browser. No account. No
+          monthly fee to create a PDF. Built for people who need to get paid today, and designed so
+          paid features can stack on top later.
+        </p>
+        <div class="hero-actions">
+          <Button href={appHref}>Create an invoice</Button>
+          <Button href={pricingHref} variant="ghost">Pro {PRO_PRICE} once</Button>
+        </div>
+        <p class="muted">Works offline after the first load · USD, EUR, and 16 other currencies</p>
+      </div>
+      <aside class="hero-card" aria-hidden="true">
+        <div class="mini-invoice">
+          <span class="kicker">Invoice INV-20260820-0042</span>
+          <b>$5,340.00 due</b>
+          <div class="mini-row"><span>Brand website redesign</span><span>$4,200</span></div>
+          <div class="mini-row"><span>Content migration · 12 hrs</span><span>$1,140</span></div>
+          <div class="mini-row"><span>Due Net 15</span><span>Meridian Labs</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="grid-3">
+        {
+          features.map((f) => (
+            <article class="card">
+              <h2 style="margin: 0 0 8px; font-size: 1.15rem;">{f.title}</h2>
+              <p class="muted" style="margin: 0;">
+                {f.body}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How it works</h2>
+      <div class="grid-3">
+        {
+          steps.map((s) => (
+            <article class="card">
+              <p class="kicker">Step {s.n}</p>
+              <h3 style="margin: 0 0 8px;">{s.title}</h3>
+              <p class="muted" style="margin: 0;">
+                {s.body}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section faq">
+      <h2>FAQ</h2>
+      {
+        faqs.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p class="muted">{item.a}</p>
+          </details>
+        ))
+      }
+    </section>
+  </main>
+
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: site.name,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      description: site.tagline,
+    })}
+  />
+</Layout>

@@ -4,8 +4,9 @@ A monorepo for building and deploying **multiple income‑generating websites** 
 pages, donation/landing pages, small products) — all from one place, and deployable to
 **free hosting providers**.
 
-The apps themselves come later. This repo is the _environment_: shared code, one command
-to build every site, and ready‑to‑use deploy pipelines for free hosts.
+The first live product is **Billsnap**, a free freelancer invoice generator
+(`apps/billsnap`). It is a static, no-signup tool with a $9 Pro unlock (watermark
+removal) so it can earn immediately via SEO, then grow into invoicing + payments.
 
 ## Stack
 
@@ -23,7 +24,8 @@ to build every site, and ready‑to‑use deploy pipelines for free hosts.
 ```
 income_apps/
 ├── apps/
-│   └── example-site/        # a starter website (copy this to add more)
+│   ├── billsnap/            # invoice generator (Cloudflare Pages + custom domain)
+│   └── example-site/        # starter website (copy this to add more)
 ├── packages/
 │   └── ui/                  # shared layout, components, styles, helpers
 ├── scripts/new-site.sh      # scaffold a new site from example-site
@@ -36,14 +38,31 @@ income_apps/
 
 ```bash
 pnpm install        # install all workspace deps
-pnpm dev            # run every site's dev server (example-site → http://localhost:4321)
+pnpm dev            # run every site's dev server (example-site → :4321, billsnap → :4322)
+pnpm test           # unit tests (Billsnap invoice math)
 pnpm build          # build every site to <app>/dist
 pnpm check          # type-check every site/package
 pnpm lint           # prettier --check
 pnpm format         # prettier --write
 ```
 
-Run a single site with pnpm filters, e.g. `pnpm --filter example-site dev`.
+Run a single site with pnpm filters, e.g. `pnpm --filter billsnap dev`
+(http://localhost:4322) or `pnpm --filter example-site dev`.
+
+## Billsnap
+
+A browser-only invoice generator aimed at the “free invoice generator” search:
+
+- Create / preview / Print-to-PDF, with tax, discounts, currencies, and a logo
+- Drafts saved in `localStorage` (no backend, no account)
+- Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
+- Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link (see **Stripe** below).
+- Hosted at [sendtheinvoice.com](https://sendtheinvoice.com) on Cloudflare Pages.
+
+```bash
+pnpm --filter billsnap test   # invoice math
+pnpm --filter billsnap dev    # http://localhost:4322
+```
 
 ## Add a new site
 
@@ -56,31 +75,55 @@ pnpm --filter my-new-site dev
 Anything under `apps/*` is picked up automatically by install, build, and the deploy
 workflows.
 
-## Deploy (free providers)
+## Deploy (custom domain, not GitHub Pages)
 
-Every site builds to a static bundle in `apps/<app>/dist`, which any static host can
-serve. Pipelines are included for the main free options:
+Billsnap is **not** published via GitHub Pages — `fd17.github.io` already uses that
+slot. Production is **https://sendtheinvoice.com** on Cloudflare Pages (project
+`fd17-billsnap`, also at `https://fd17-billsnap.pages.dev`).
 
-| Provider             | How                                                                                                              | Best for                               |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **Cloudflare Pages** | `.github/workflows/deploy-cloudflare-pages.yml` (needs `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` secrets) | Many sites from one repo (recommended) |
-| **GitHub Pages**     | `.github/workflows/deploy-github-pages.yml` (no secrets)                                                         | One primary site, zero setup           |
-| **Netlify**          | `apps/<app>/netlify.toml`                                                                                        | Per‑site, connect in Netlify UI        |
-| **Vercel**           | `apps/<app>/vercel.json`                                                                                         | Per‑site, connect in Vercel UI         |
+Push to `main` deploys when repo secrets `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` are set. Canonical URLs use `SITE_URL` /
+`BILLSNAP_SITE_URL`. The Pro button uses `PUBLIC_CHECKOUT_URL` (see Stripe below).
 
-Cloudflare Pages allows an unlimited number of projects on its free tier, so it is the
-recommended default when publishing several sites. GitHub Pages serves a single site per
-repository — use it for the repo's primary site.
+To attach another hostname on the same Cloudflare account (adds apex + www,
+creates proxied CNAMEs to `fd17-billsnap.pages.dev`, and waits for SSL):
 
-Each site's canonical URL and base path are configurable via `SITE_URL` and `BASE_PATH`
-env vars (see `apps/example-site/.env.example`). The deploy workflows set these for you.
+```bash
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
+  ./scripts/attach-billsnap-domain.sh other-domain.tld
+```
 
-> Note: none of these run automatically on push. Deploy workflows are manual
-> (`workflow_dispatch`) so you can enable a provider and add its credentials as GitHub
-> **Secrets** first. CI (build/lint/type-check) runs on every push and PR.
+Netlify and Vercel configs remain under each app if you prefer those UIs instead.
+
+CI (format, lint, type-check, tests, build) still runs on every push and PR.
+
+## Stripe (Pro unlock)
+
+Billsnap has no backend. Stripe Checkout is a **Payment Link**; after pay, Stripe
+sends the browser to `/app/?unlocked=1`, which sets Pro in `localStorage`.
+
+1. Create a [Stripe account](https://dashboard.stripe.com/register) and complete
+   activation if you want live charges (test mode works first).
+2. **Product catalog → Add product**
+   - Name: `Billsnap Pro`
+   - One-time, **$9 USD** (not a recurring price)
+3. **Payment links → New**
+   - Product: Billsnap Pro, quantity 1
+   - **After the payment → Confirmation page → Redirect to a URL**
+   - URL: `https://sendtheinvoice.com/app/?unlocked=1`
+4. Copy the link (`https://buy.stripe.com/...`).
+5. Add a GitHub Actions **variable** (Settings → Secrets and variables → Actions → Variables):
+   - `PUBLIC_CHECKOUT_URL` = that `buy.stripe.com` URL
+6. Redeploy: merge to `main`, or run **Deploy Billsnap to Cloudflare Pages**.
+
+Optional tip jar: another Payment Link (or Ko-fi) in variable `PUBLIC_DONATE_URL`.
+
+This unlock is device-local on purpose (static hosting). Anyone who opens
+`?unlocked=1` gets Pro in that browser. Fine for a $9 MVP; a signed Stripe session
+would need a Worker or other backend.
 
 ## Cloud Agent environment
 
 `.cursor/environment.json` configures Cursor Cloud Agents for this repo: it installs deps
-(`pnpm install --frozen-lockfile`) and runs `pnpm dev` in a persistent terminal, exposing
-`example-site` on port 4321.
+(`pnpm install --frozen-lockfile`) and runs `pnpm dev` in a persistent terminal.
+example-site is served on http://localhost:4321, billsnap on http://localhost:4322.

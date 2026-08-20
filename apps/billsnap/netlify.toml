@@ -1,0 +1,10 @@
+# Netlify config for deploying this single app (free tier).
+# In the Netlify UI, create a site from this repo and set the base directory to
+# "apps/billsnap"; Netlify then reads this file.
+[build]
+  base = "apps/billsnap"
+  command = "pnpm install --frozen-lockfile && pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

@@ -1,0 +1,97 @@
+---
+import Button from '@repo/ui/Button.astro';
+import Layout from '../components/Layout.astro';
+import { CHECKOUT_URL, DONATE_URL, PRO_PRICE, site } from '../site';
+
+const base = import.meta.env.BASE_URL;
+const appHref = `${base}app/`.replace(/\/+/g, '/');
+const checkoutHref = CHECKOUT_URL || appHref;
+const checkoutIsLive = Boolean(CHECKOUT_URL);
+---
+
+<Layout
+  site={site}
+  page="Pricing"
+  description="Billsnap is free to use. Pro is a one-time unlock to remove branding and keep unlimited invoices on this device."
+>
+  <main class="section prose">
+    <p class="kicker">Pricing</p>
+    <h1>Free to send the invoice. {PRO_PRICE} to look like you, not us.</h1>
+    <p class="lede">
+      The generator is the product. Money comes from people who already used it once and want the
+      Billsnap line gone — the same model invoice-generator.com used to build a real business, minus
+      the account wall.
+    </p>
+
+    <div class="grid-2" style="margin-top: 28px;">
+      <article class="card">
+        <h2 style="margin: 0;">Free</h2>
+        <p class="price">$0</p>
+        <ul>
+          <li>Unlimited invoices created in the browser</li>
+          <li>PDF via Print</li>
+          <li>Classic and Minimal templates</li>
+          <li>Up to 5 saved drafts on this device</li>
+          <li>Small “Created with Billsnap” line on the PDF</li>
+        </ul>
+        <div class="row-actions">
+          <Button href={appHref}>Start free</Button>
+        </div>
+      </article>
+      <article class="card">
+        <h2 style="margin: 0;">Pro</h2>
+        <p class="price">{PRO_PRICE}</p>
+        <ul>
+          <li>No branding on the PDF</li>
+          <li>Bold template</li>
+          <li>Unlimited saves in this browser</li>
+          <li>One-time, not a subscription</li>
+        </ul>
+        <div class="row-actions">
+          <Button href={checkoutIsLive ? checkoutHref : appHref}>
+            {checkoutIsLive ? `Unlock Pro · ${PRO_PRICE}` : 'Use the free generator'}
+          </Button>
+        </div>
+        {
+          checkoutIsLive ? (
+            <p class="muted">
+              After checkout, return to the app with <code>?unlocked=1</code> on the URL (set this
+              as the Stripe Payment Link success URL).
+            </p>
+          ) : (
+            <p class="muted">
+              Live checkout is not connected yet. Set <code>PUBLIC_CHECKOUT_URL</code> to a Stripe
+              Payment Link (or Lemon Squeezy / Polar link) pointing at{' '}
+              <code>{appHref}?unlocked=1</code> as the success URL. The free generator works today.
+            </p>
+          )
+        }
+      </article>
+    </div>
+
+    <h2>How this makes money, then scales</h2>
+    <ol>
+      <li>
+        <strong>Now:</strong> SEO for “free invoice generator” + a {PRO_PRICE} unlock. Optional donate
+        link
+        {DONATE_URL ? ' is already wired.' : ' via PUBLIC_DONATE_URL.'}
+      </li>
+      <li>
+        <strong>Next:</strong> put a hosted payment link on the invoice (Stripe Payment Links) so freelancers
+        get paid faster — still no backend.
+      </li>
+      <li>
+        <strong>Later:</strong> accounts, recurring invoices, overdue reminders, and a 1% take on collected
+        payments. That is the SaaS.
+      </li>
+    </ol>
+
+    {
+      DONATE_URL && (
+        <p>
+          If Pro is more than you need: <a href={DONATE_URL}>leave a tip</a>.
+        </p>
+      )
+    }
+  </main>
+</Layout>

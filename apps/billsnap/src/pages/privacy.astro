@@ -1,0 +1,28 @@
+---
+import Layout from '../components/Layout.astro';
+import { site } from '../site';
+---
+
+<Layout
+  site={site}
+  page="Privacy"
+  description="Billsnap stores invoices in your browser. We do not run an account database."
+>
+  <main class="section prose">
+    <h1>Privacy</h1>
+    <p>
+      Billsnap is a static website. Invoice contents, logos, and saved drafts are written to
+      <strong>localStorage in your browser</strong>. They are not uploaded to a Billsnap server
+      because there is not one.
+    </p>
+    <p>
+      If you connect a checkout link later (Stripe, Polar, Lemon Squeezy), that provider processes
+      the Pro payment under their privacy policy. Billsnap does not receive card numbers.
+    </p>
+    <p>
+      Clearing this site’s data in your browser deletes drafts. Print or download a PDF if you need
+      a copy that survives that.
+    </p>
+    <p class="muted">Last updated 20 August 2026.</p>
+  </main>
+</Layout>
