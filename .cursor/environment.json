@@ -1,0 +1,4 @@
+{
+  "name": "income_apps",
+  "install": "bash scripts/install_kraken_cli.sh && pip3 install --user -r requirements-dev.txt && pip3 install --user -e ."
+}
