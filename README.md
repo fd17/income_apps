@@ -58,7 +58,7 @@ A browser-only invoice generator aimed at the “free invoice generator” searc
 - Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
 - Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link whose success URL is
   `/app/?unlocked=1` to start charging. Optional `PUBLIC_DONATE_URL` for a tip jar.
-- Hosted on Cloudflare Pages with a custom domain (not GitHub Pages).
+- Hosted at [sendtheinvoice.com](https://sendtheinvoice.com) on Cloudflare Pages.
 
 ```bash
 pnpm --filter billsnap test   # invoice math
@@ -79,34 +79,19 @@ workflows.
 ## Deploy (custom domain, not GitHub Pages)
 
 Billsnap is **not** published via GitHub Pages — `fd17.github.io` already uses that
-slot. It deploys to **Cloudflare Pages** (free), which gives the project its own
-hostname (`fd17-billsnap.pages.dev`) and a real custom domain on the free tier.
+slot. Production is **https://sendtheinvoice.com** on Cloudflare Pages (project
+`fd17-billsnap`, also at `https://fd17-billsnap.pages.dev`).
 
-### One-time Cloudflare + DNS
+Push to `main` deploys when repo secrets `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` are set. Canonical URLs use `SITE_URL` /
+`BILLSNAP_SITE_URL` (see `apps/billsnap/.env.example`).
 
-1. Create a free [Cloudflare](https://dash.cloudflare.com/sign-up) account.
-2. Add GitHub Actions **secrets** on this repo:
-   - `CLOUDFLARE_API_TOKEN` — token with **Account / Cloudflare Pages / Edit**
-   - `CLOUDFLARE_ACCOUNT_ID` — from the Cloudflare dashboard URL or Overview
-3. Add GitHub Actions **variable** `BILLSNAP_SITE_URL` = `https://your-domain.tld`
-   (no trailing slash).
-4. Point DNS at the Pages project:
+To attach another hostname on the same Cloudflare account:
 
-   | Name       | Type                       | Target                    |
-   | ---------- | -------------------------- | ------------------------- |
-   | `@` (apex) | CNAME (flattened) or ALIAS | `fd17-billsnap.pages.dev` |
-   | `www`      | CNAME                      | `fd17-billsnap.pages.dev` |
-
-   If the domain’s nameservers are on the same Cloudflare account, you can instead run:
-
-   ```bash
-   CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
-     ./scripts/attach-billsnap-domain.sh your-domain.tld
-   ```
-
-Push to `main` (or run **Deploy Billsnap to Cloudflare Pages**) after the secrets
-exist. Canonical URLs come from `BILLSNAP_SITE_URL` / `SITE_URL` (see
-`apps/billsnap/.env.example`).
+```bash
+CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… \
+  ./scripts/attach-billsnap-domain.sh other-domain.tld
+```
 
 Netlify and Vercel configs remain under each app if you prefer those UIs instead.
 

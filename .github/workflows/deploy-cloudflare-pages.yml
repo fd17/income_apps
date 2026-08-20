@@ -42,7 +42,7 @@ jobs:
       - name: Build billsnap
         run: pnpm --filter billsnap build
         env:
-          SITE_URL: ${{ vars.BILLSNAP_SITE_URL || 'https://fd17-billsnap.pages.dev' }}
+          SITE_URL: ${{ vars.BILLSNAP_SITE_URL || 'https://sendtheinvoice.com' }}
           BASE_PATH: /
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
