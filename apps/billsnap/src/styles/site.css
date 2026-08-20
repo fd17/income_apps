@@ -407,6 +407,8 @@ h3 {
 
 .paper {
   --accent: #0f766e;
+  position: relative;
+  overflow: hidden;
   background: white;
   color: #1c1917;
   border: 1px solid var(--line);
@@ -414,6 +416,70 @@ h3 {
   padding: 36px;
   min-height: 640px;
   box-shadow: var(--shadow);
+}
+
+.paper-watermarked {
+  isolation: isolate;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.paper-watermarked::before {
+  content: attr(data-watermark);
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 4;
+  transform: translate(-50%, -50%) rotate(-28deg);
+  font-size: clamp(1.15rem, 3.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(15 23 42 / 0.08);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.paper-watermark-tiles {
+  position: absolute;
+  inset: -18%;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  justify-content: center;
+  gap: 2.4rem 2.8rem;
+  transform: rotate(-32deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.paper-watermark-tile {
+  flex: 0 0 auto;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0f172a;
+  opacity: 0.14;
+  white-space: nowrap;
+}
+
+.paper-watermark-footer {
+  position: relative;
+  z-index: 6;
+  margin: 36px 0 0;
+  text-align: center;
+  color: #57534e;
+  font-size: 0.78rem;
+  user-select: none;
+}
+
+.paper-watermark-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .paper-header {
@@ -525,13 +591,6 @@ h3 {
   margin-top: 36px;
 }
 
-.paper-watermark {
-  margin: 40px 0 0;
-  text-align: center;
-  color: #a8a29e;
-  font-size: 0.8rem;
-}
-
 .paper-minimal .paper-header {
   border-bottom-width: 1px;
 }
@@ -603,7 +662,34 @@ h3 {
     border: 0;
     box-shadow: none;
     padding: 0;
-    background: white;
+    background-color: white;
+  }
+
+  .paper-watermarked {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: hidden;
+  }
+
+  .paper-watermarked::before,
+  .paper-watermark-tiles,
+  .paper-watermark-tile,
+  .paper-watermark-footer {
+    visibility: visible !important;
+    color: inherit;
+  }
+
+  .paper-watermark-tiles {
+    display: flex !important;
+  }
+
+  .paper-watermark-tile {
+    color: #0f172a !important;
+    opacity: 0.16 !important;
+  }
+
+  .paper-watermark-footer {
+    display: block !important;
   }
 
   .app-page,
