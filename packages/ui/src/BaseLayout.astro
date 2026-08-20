@@ -1,0 +1,30 @@
+---
+import '@repo/ui/styles.css';
+import { pageTitle, type SiteMeta } from '@repo/ui/config';
+
+interface Props {
+  site: SiteMeta;
+  page?: string;
+  description?: string;
+}
+
+const { site, page, description } = Astro.props;
+const title = pageTitle(site, page);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={site.url} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

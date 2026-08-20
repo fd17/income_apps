@@ -1,0 +1,12 @@
+---
+interface Props {
+  href: string;
+  variant?: 'primary' | 'ghost';
+}
+
+const { href, variant = 'primary' } = Astro.props;
+---
+
+<a class={`btn btn-${variant}`} href={href}>
+  <slot />
+</a>
