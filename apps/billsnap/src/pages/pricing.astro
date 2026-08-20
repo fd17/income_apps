@@ -12,15 +12,15 @@ const checkoutIsLive = Boolean(CHECKOUT_URL);
 <Layout
   site={site}
   page="Pricing"
-  description="Billsnap is free to use. Pro is a one-time unlock to remove branding and keep unlimited invoices on this device."
+  description="Billsnap is free to use. Pro is a one-time unlock to remove the watermark and keep unlimited invoices on this device."
 >
   <main class="section prose">
     <p class="kicker">Pricing</p>
     <h1>Free to send the invoice. {PRO_PRICE} to look like you, not us.</h1>
     <p class="lede">
       The generator is the product. Money comes from people who already used it once and want the
-      Billsnap line gone — the same model invoice-generator.com used to build a real business, minus
-      the account wall.
+      Billsnap watermark gone — the same model invoice-generator.com used to build a real business,
+      minus the account wall.
     </p>
 
     <div class="grid-2" style="margin-top: 28px;">
@@ -32,7 +32,7 @@ const checkoutIsLive = Boolean(CHECKOUT_URL);
           <li>PDF via Print</li>
           <li>Classic and Minimal templates</li>
           <li>Up to 5 saved drafts on this device</li>
-          <li>Small “Created with Billsnap” line on the PDF</li>
+          <li>Diagonal Billsnap watermark with sendtheinvoice.com on the PDF</li>
         </ul>
         <div class="row-actions">
           <Button href={appHref}>Start free</Button>
@@ -42,7 +42,7 @@ const checkoutIsLive = Boolean(CHECKOUT_URL);
         <h2 style="margin: 0;">Pro</h2>
         <p class="price">{PRO_PRICE}</p>
         <ul>
-          <li>No branding on the PDF</li>
+          <li>No watermark on the PDF</li>
           <li>Bold template</li>
           <li>Unlimited saves in this browser</li>
           <li>One-time, not a subscription</li>

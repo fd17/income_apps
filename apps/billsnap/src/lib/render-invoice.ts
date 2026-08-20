@@ -5,6 +5,13 @@ import {
   TERMS_LABEL,
   type Invoice,
 } from './invoice';
+import {
+  WATERMARK_TILE_COUNT,
+  WATERMARK_URL,
+  watermarkBackgroundDataUri,
+  watermarkFooterText,
+  watermarkOverlayText,
+} from './watermark';
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -117,15 +124,35 @@ export function renderInvoicePaper(invoice: Invoice, isPro: boolean): HTMLElemen
   }
 
   if (shouldShowWatermark(isPro)) {
-    const mark = el(
-      'p',
-      'paper-watermark',
-      'Created with Billsnap · Unlock Pro to remove this line',
-    );
-    paper.append(mark);
+    applyWatermark(paper);
   }
 
   return paper;
+}
+
+function applyWatermark(paper: HTMLElement): void {
+  const phrase = watermarkOverlayText();
+  paper.classList.add('paper-watermarked');
+  paper.dataset.watermark = watermarkFooterText();
+  paper.style.backgroundImage = watermarkBackgroundDataUri();
+  paper.style.backgroundRepeat = 'repeat';
+  paper.style.backgroundSize = '380px 240px';
+
+  const tiles = el('div', 'paper-watermark-tiles');
+  tiles.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < WATERMARK_TILE_COUNT; i += 1) {
+    tiles.append(el('span', 'paper-watermark-tile', phrase));
+  }
+  paper.append(tiles);
+
+  const footer = el('p', 'paper-watermark-footer');
+  footer.append(document.createTextNode('Created with Billsnap · '));
+  const link = document.createElement('a');
+  link.className = 'paper-watermark-link';
+  link.href = WATERMARK_URL;
+  link.textContent = WATERMARK_URL;
+  footer.append(link);
+  paper.append(footer);
 }
 
 function row(label: string, value: string): HTMLElement {

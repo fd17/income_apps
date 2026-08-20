@@ -55,7 +55,7 @@ A browser-only invoice generator aimed at the “free invoice generator” searc
 
 - Create / preview / Print-to-PDF, with tax, discounts, currencies, and a logo
 - Drafts saved in `localStorage` (no backend, no account)
-- Free plan includes a small Billsnap line on the PDF; Pro is a one-time $9 unlock
+- Free plan includes a Billsnap watermark with sendtheinvoice.com on the PDF; Pro is a one-time $9 unlock
 - Wire `PUBLIC_CHECKOUT_URL` to a Stripe Payment Link (see **Stripe** below).
 - Hosted at [sendtheinvoice.com](https://sendtheinvoice.com) on Cloudflare Pages.
 
